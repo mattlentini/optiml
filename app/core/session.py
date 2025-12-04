@@ -513,12 +513,28 @@ class Session:
             return False
         return self.db.delete_experiment(experiment_id)
     
-    def suggest_next(self) -> Dict[str, Any]:
-        """Get next suggested parameters."""
+    def suggest_next(
+        self, 
+        use_prior: bool = False, 
+        prior_weight: float = 0.5
+    ) -> Dict[str, Any]:
+        """Get next suggested parameters.
+        
+        Args:
+            use_prior: If True, use prior knowledge from historical experiments.
+            prior_weight: Balance between prior and exploration (0-1). Higher = more prior.
+        
+        Returns:
+            Dict of parameter names to suggested values.
+        """
         if not self.current_experiment:
             raise ValueError("No active experiment")
         
-        optimizer = self.current_experiment.get_optimizer()
+        optimizer = self.current_experiment.get_optimizer(
+            use_prior=use_prior,
+            prior_weight=prior_weight,
+            db=self.db
+        )
         x = optimizer.suggest()
         
         # Convert to named dict
@@ -528,6 +544,70 @@ class Session:
         
         self.suggested_params = params
         return params
+    
+    def suggest_batch(
+        self,
+        n_points: int = 2,
+        strategy: str = 'local_penalization',
+        use_prior: bool = False,
+        prior_weight: float = 0.5,
+        **kwargs
+    ) -> List[Dict[str, Any]]:
+        """Get batch of suggested parameters for parallel experiments.
+        
+        Args:
+            n_points: Number of points to suggest.
+            strategy: Batch strategy ('constant_liar', 'local_penalization', 'qei').
+            use_prior: If True, use prior knowledge from historical experiments.
+            prior_weight: Balance between prior and exploration (0-1).
+            **kwargs: Additional arguments for batch acquisition.
+        
+        Returns:
+            List of parameter dictionaries.
+        """
+        if not self.current_experiment:
+            raise ValueError("No active experiment")
+        
+        # Import batch function
+        from optiml.batch import suggest_batch
+        
+        # Get optimizer with optional prior knowledge
+        optimizer = self.current_experiment.get_optimizer(
+            use_prior=use_prior,
+            prior_weight=prior_weight,
+            db=self.db
+        )
+        
+        # Get batch suggestions (list of lists)
+        batch_x = suggest_batch(optimizer, n_points=n_points, strategy=strategy, **kwargs)
+        
+        # Convert to list of dicts
+        batch_params = []
+        param_names = [p.name for p in self.current_experiment.parameters]
+        
+        for x in batch_x:
+            params = {}
+            for i, p_name in enumerate(param_names):
+                params[p_name] = x[i]
+            batch_params.append(params)
+        
+        return batch_params
+    
+    def get_prior_knowledge_info(self) -> Dict[str, Any]:
+        """Get information about available prior knowledge for current experiment.
+        
+        Returns:
+            Dict with prior knowledge details including:
+            - has_prior: Whether prior knowledge is available
+            - n_similar_experiments: Number of similar historical experiments
+            - n_historical_trials: Total trials from similar experiments
+            - similar_experiments: List of similar experiment names/IDs
+            - parameter_priors: Dict of parameter-specific prior info
+        """
+        if not self.current_experiment:
+            raise ValueError("No active experiment")
+        
+        return self.current_experiment.get_prior_info(db=self.db)
     
     def record_result(self, objective_value: float, notes: str = "") -> Trial:
         """Record the result of the suggested parameters."""
