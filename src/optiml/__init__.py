@@ -146,6 +146,54 @@ from optiml.convergence import (
     create_convergence_monitor,
 )
 
+# Model selection and AutoML
+from optiml.model_selection import (
+    KernelFamily,
+    KernelConfig,
+    ModelScore,
+    create_kernel,
+    KernelSelector,
+    HyperparameterConfig,
+    HyperparameterTuner,
+    GPEnsemble,
+    AutoML,
+)
+
+# Sensitivity analysis
+from optiml.sensitivity import (
+    SobolIndices,
+    MorrisResult,
+    LocalSensitivity,
+    compute_sobol_indices,
+    compute_sobol_from_surrogate,
+    compute_morris,
+    compute_morris_from_surrogate,
+    compute_local_sensitivity,
+    compute_local_sensitivity_from_surrogate,
+    correlation_sensitivity,
+    main_effect_indices,
+    SensitivityAnalyzer,
+)
+
+# Robust optimization
+from optiml.robust import (
+    RiskMeasure,
+    UncertaintySet,
+    RobustResult,
+    compute_cvar,
+    compute_var,
+    compute_mean_variance,
+    compute_entropic_risk,
+    RobustAcquisition,
+    RobustExpectedImprovement,
+    WorstCaseAcquisition,
+    CVaRAcquisition,
+    RobustOptimizer,
+    robust_evaluation,
+    DistributionallyRobustOptimizer,
+    create_robust_optimizer,
+)
+
 
 __version__ = "0.1.0"
 
@@ -268,4 +316,43 @@ __all__ = [
     "PlateauDetector",
     "BudgetAdvisor",
     "create_convergence_monitor",
+    # Model selection
+    "KernelFamily",
+    "KernelConfig",
+    "ModelScore",
+    "create_kernel",
+    "KernelSelector",
+    "HyperparameterConfig",
+    "HyperparameterTuner",
+    "GPEnsemble",
+    "AutoML",
+    # Sensitivity analysis
+    "SobolIndices",
+    "MorrisResult",
+    "LocalSensitivity",
+    "compute_sobol_indices",
+    "compute_sobol_from_surrogate",
+    "compute_morris",
+    "compute_morris_from_surrogate",
+    "compute_local_sensitivity",
+    "compute_local_sensitivity_from_surrogate",
+    "correlation_sensitivity",
+    "main_effect_indices",
+    "SensitivityAnalyzer",
+    # Robust optimization
+    "RiskMeasure",
+    "UncertaintySet",
+    "RobustResult",
+    "compute_cvar",
+    "compute_var",
+    "compute_mean_variance",
+    "compute_entropic_risk",
+    "RobustAcquisition",
+    "RobustExpectedImprovement",
+    "WorstCaseAcquisition",
+    "CVaRAcquisition",
+    "RobustOptimizer",
+    "robust_evaluation",
+    "DistributionallyRobustOptimizer",
+    "create_robust_optimizer",
 ]
