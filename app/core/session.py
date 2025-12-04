@@ -154,11 +154,51 @@ class Experiment:
         dimensions = [p.to_dimension() for p in self.parameters]
         return Space(dimensions)
     
-    def get_optimizer(self) -> BayesianOptimizer:
-        """Create optimizer with current trials."""
+    def get_optimizer(self, use_prior: bool = False, prior_weight: float = 0.5, db=None) -> BayesianOptimizer:
+        """Create optimizer with current trials.
+        
+        Args:
+            use_prior: If True, use prior knowledge from historical experiments.
+            prior_weight: Weight for prior vs exploration (0-1). Higher = more prior influence.
+            db: Database instance for prior knowledge. Uses global db if not provided.
+        
+        Returns:
+            BayesianOptimizer configured with optional prior knowledge.
+        """
         space = self.get_space()
         # BayesianOptimizer uses maximize=True/False, so we invert minimize
-        optimizer = BayesianOptimizer(space, maximize=not self.minimize)
+        
+        if use_prior:
+            # Import prior knowledge components
+            from optiml.priors import get_prior_for_experiment, PriorAwareBayesianOptimizer
+            
+            if db is None:
+                from .database import get_database
+                db = get_database()
+            
+            # Convert parameters to dict format for prior lookup
+            param_dicts = [
+                {
+                    'name': p.name,
+                    'param_type': p.param_type,
+                    'low': p.low,
+                    'high': p.high,
+                }
+                for p in self.parameters
+            ]
+            
+            # Get prior knowledge from similar experiments
+            prior = get_prior_for_experiment(db, param_dicts)
+            
+            # Create prior-aware optimizer
+            optimizer = PriorAwareBayesianOptimizer(
+                space, 
+                prior, 
+                prior_weight=prior_weight,
+                maximize=not self.minimize
+            )
+        else:
+            optimizer = BayesianOptimizer(space, maximize=not self.minimize)
         
         # Add existing trials
         for trial in self.trials:
@@ -167,6 +207,59 @@ class Experiment:
                 optimizer.tell(x, trial.objective_value)
         
         return optimizer
+    
+    def get_prior_info(self, db=None) -> Dict[str, Any]:
+        """Get information about available prior knowledge.
+        
+        Returns a summary of similar experiments and what prior knowledge
+        would be used for optimization.
+        
+        Args:
+            db: Database instance. Uses global db if not provided.
+            
+        Returns:
+            Dict with prior knowledge summary.
+        """
+        from optiml.priors import PriorKnowledgeBuilder
+        
+        if db is None:
+            from .database import get_database
+            db = get_database()
+        
+        # Convert parameters to dict format
+        param_dicts = [
+            {
+                'name': p.name,
+                'param_type': p.param_type,
+                'low': p.low,
+                'high': p.high,
+            }
+            for p in self.parameters
+        ]
+        
+        builder = PriorKnowledgeBuilder(db)
+        prior = builder.build_experiment_prior(param_dicts)
+        
+        # Build summary
+        summary = {
+            'has_prior': prior.n_experiments > 0,
+            'n_similar_experiments': prior.n_experiments,
+            'n_historical_trials': prior.n_trials,
+            'similar_experiments': prior.metadata.get('similar_experiments', []),
+            'parameter_priors': {},
+        }
+        
+        for name, param_prior in prior.parameter_priors.items():
+            summary['parameter_priors'][name] = {
+                'confidence': param_prior.confidence,
+                'mean_optimal': param_prior.mean_optimal,
+                'std_optimal': param_prior.std_optimal,
+                'n_samples': len(param_prior.best_values),
+            }
+            if param_prior.value_counts:
+                summary['parameter_priors'][name]['category_probs'] = param_prior.get_category_probabilities()
+        
+        return summary
     
     def get_best_trial(self) -> Optional[Trial]:
         """Get the best trial so far."""

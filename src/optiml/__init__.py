@@ -117,6 +117,16 @@ from optiml.multi_objective import (
     generate_weight_vectors,
 )
 
+# Prior knowledge from historical data
+from optiml.priors import (
+    ParameterPrior,
+    ExperimentPrior,
+    PriorKnowledgeBuilder,
+    PriorAwareBayesianOptimizer,
+    get_prior_for_experiment,
+    create_prior_aware_optimizer,
+)
+
 
 __version__ = "0.1.0"
 
@@ -219,4 +229,11 @@ __all__ = [
     "ExpectedHypervolumeImprovement",
     "MultiObjectiveOptimizer",
     "generate_weight_vectors",
+    # Prior knowledge
+    "ParameterPrior",
+    "ExperimentPrior",
+    "PriorKnowledgeBuilder",
+    "PriorAwareBayesianOptimizer",
+    "get_prior_for_experiment",
+    "create_prior_aware_optimizer",
 ]
