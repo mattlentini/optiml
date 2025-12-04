@@ -127,6 +127,15 @@ from optiml.priors import (
     create_prior_aware_optimizer,
 )
 
+# Batch/parallel acquisition
+from optiml.batch import (
+    BatchAcquisitionFunction,
+    ConstantLiarBatch,
+    LocalPenalizationBatch,
+    qExpectedImprovement,
+    suggest_batch,
+)
+
 
 __version__ = "0.1.0"
 
@@ -236,4 +245,10 @@ __all__ = [
     "PriorAwareBayesianOptimizer",
     "get_prior_for_experiment",
     "create_prior_aware_optimizer",
+    # Batch acquisition
+    "BatchAcquisitionFunction",
+    "ConstantLiarBatch",
+    "LocalPenalizationBatch",
+    "qExpectedImprovement",
+    "suggest_batch",
 ]
