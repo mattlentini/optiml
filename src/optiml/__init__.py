@@ -194,6 +194,27 @@ from optiml.robust import (
     create_robust_optimizer,
 )
 
+# Interactive Plotly visualizations (optional)
+try:
+    from optiml.plotly_viz import (
+        PlotlyTheme,
+        LIGHT_THEME,
+        DARK_THEME,
+        surface_3d,
+        contour_plot,
+        parallel_coordinates,
+        pareto_front as plotly_pareto_front,
+        convergence_animation,
+        acquisition_landscape,
+        uncertainty_plot,
+        effects_plot,
+        slice_plot,
+        save_figure,
+    )
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
+
 
 __version__ = "0.1.0"
 
@@ -355,4 +376,19 @@ __all__ = [
     "robust_evaluation",
     "DistributionallyRobustOptimizer",
     "create_robust_optimizer",
+    # Interactive Plotly visualizations (when available)
+    "PlotlyTheme",
+    "LIGHT_THEME",
+    "DARK_THEME",
+    "surface_3d",
+    "contour_plot",
+    "parallel_coordinates",
+    "plotly_pareto_front",
+    "convergence_animation",
+    "acquisition_landscape",
+    "uncertainty_plot",
+    "effects_plot",
+    "slice_plot",
+    "save_figure",
+    "PLOTLY_AVAILABLE",
 ]
