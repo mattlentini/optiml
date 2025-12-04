@@ -136,6 +136,16 @@ from optiml.batch import (
     suggest_batch,
 )
 
+# Early stopping and convergence detection
+from optiml.convergence import (
+    StoppingCriteria,
+    StoppingState,
+    ConvergenceMonitor,
+    PlateauDetector,
+    BudgetAdvisor,
+    create_convergence_monitor,
+)
+
 
 __version__ = "0.1.0"
 
@@ -251,4 +261,11 @@ __all__ = [
     "LocalPenalizationBatch",
     "qExpectedImprovement",
     "suggest_batch",
+    # Convergence detection
+    "StoppingCriteria",
+    "StoppingState",
+    "ConvergenceMonitor",
+    "PlateauDetector",
+    "BudgetAdvisor",
+    "create_convergence_monitor",
 ]

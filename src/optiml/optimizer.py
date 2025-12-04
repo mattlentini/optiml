@@ -196,6 +196,98 @@ class BayesianOptimizer:
             return self._suggest_initial()
         return self._suggest_acquisition()
 
+    def suggest_batch(
+        self,
+        n_suggestions: int,
+        strategy: str = "local_penalization",
+    ) -> list[list[Any]]:
+        """Suggest multiple points to evaluate in parallel.
+
+        Parameters
+        ----------
+        n_suggestions : int
+            Number of points to suggest.
+        strategy : str, default="local_penalization"
+            Batch optimization strategy:
+            - "local_penalization": Penalize around selected points
+            - "kriging_believer": Use predicted mean as fantasy observation
+            - "constant_liar": Use constant value as fantasy observation
+            - "random": Random sampling (no batch optimization)
+
+        Returns
+        -------
+        list[list[Any]]
+            List of suggested parameter configurations.
+
+        Examples
+        --------
+        >>> batch = optimizer.suggest_batch(n_suggestions=4)
+        >>> results = [objective(x) for x in batch]
+        >>> optimizer.tell_batch(batch, results)
+        """
+        from optiml.acquisition import (
+            LocalPenalization,
+            KrigingBeliever,
+            ConstantLiar,
+        )
+
+        # If not enough data for GP, return random suggestions
+        if len(self._X) < self.n_initial:
+            return [self._suggest_initial() for _ in range(n_suggestions)]
+
+        # Transform observed data to normalized space
+        X_normalized = self.space.transform(self._X)
+        y_array = np.array(self._y)
+
+        # Flip sign if minimizing
+        if not self.maximize:
+            y_array = -y_array
+
+        # Fit the surrogate model
+        self.surrogate.fit(X_normalized, y_array)
+
+        # Best observed value
+        y_best = np.max(y_array)
+
+        # Bounds in normalized space
+        n_dims = len(self.space)
+        bounds = [(0, 1)] * n_dims
+
+        # Select batch strategy
+        if strategy == "local_penalization":
+            batch_optimizer = LocalPenalization(self.acquisition)
+            result = batch_optimizer.suggest_batch(
+                self.surrogate, y_best, n_suggestions, bounds
+            )
+        elif strategy == "kriging_believer":
+            batch_optimizer = KrigingBeliever(self.acquisition)
+            result = batch_optimizer.suggest_batch(
+                self.surrogate, y_best, n_suggestions, bounds,
+                X_observed=X_normalized, y_observed=y_array
+            )
+        elif strategy == "constant_liar":
+            batch_optimizer = ConstantLiar(self.acquisition, lie_value="min")
+            result = batch_optimizer.suggest_batch(
+                self.surrogate, y_best, n_suggestions, bounds,
+                y_observed=y_array
+            )
+        elif strategy == "random":
+            return [self._suggest_initial() for _ in range(n_suggestions)]
+        else:
+            raise ValueError(
+                f"Unknown batch strategy: {strategy}. "
+                f"Available: local_penalization, kriging_believer, constant_liar, random"
+            )
+
+        # Transform back to original space
+        batch = []
+        for x_normalized in result.X:
+            x_clipped = np.clip(x_normalized, 0, 1)
+            x_original = self.space.inverse_transform(x_clipped.reshape(1, -1))[0]
+            batch.append(x_original)
+
+        return batch
+
     def tell(self, x: list[Any], y: float) -> None:
         """Record an observation.
 
@@ -212,6 +304,25 @@ class BayesianOptimizer:
         """
         self._X.append(x)
         self._y.append(y)
+
+    def tell_batch(self, X: list[list[Any]], y: list[float]) -> None:
+        """Record multiple observations at once.
+
+        Parameters
+        ----------
+        X : list[list[Any]]
+            List of evaluated parameter configurations.
+        y : list[float]
+            List of corresponding objective values.
+
+        Examples
+        --------
+        >>> batch = optimizer.suggest_batch(4)
+        >>> results = [objective(x) for x in batch]
+        >>> optimizer.tell_batch(batch, results)
+        """
+        for x_i, y_i in zip(X, y):
+            self.tell(x_i, y_i)
 
     def optimize(
         self,
