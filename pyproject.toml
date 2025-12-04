@@ -39,11 +39,18 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
 ]
+app = [
+    "flet>=0.28.0",
+    "matplotlib>=3.7.0",
+]
+all = [
+    "optiml[dev,app]",
+]
 
 [project.urls]
-Homepage = "https://github.com/optiml/optiml"
-Documentation = "https://github.com/optiml/optiml#readme"
-Repository = "https://github.com/optiml/optiml"
+Homepage = "https://github.com/mattlentini/optiml"
+Documentation = "https://github.com/mattlentini/optiml#readme"
+Repository = "https://github.com/mattlentini/optiml"
 
 [tool.setuptools.packages.find]
 where = ["src"]

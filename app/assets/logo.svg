@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Background circle - subtle -->
+  <circle cx="60" cy="60" r="56" stroke="#3B82F6" stroke-width="2" opacity="0.2"/>
+  
+  <!-- Optimization curve - represents finding the optimum -->
+  <path 
+    d="M20 85 Q35 75, 45 55 Q55 30, 65 35 Q80 42, 90 70 Q95 82, 100 85" 
+    stroke="url(#curveGradient)" 
+    stroke-width="3" 
+    stroke-linecap="round"
+    fill="none"
+  />
+  
+  <!-- Optimal point marker - the "bullseye" -->
+  <circle cx="65" cy="35" r="8" fill="url(#pointGradient)"/>
+  <circle cx="65" cy="35" r="4" fill="#ffffff"/>
+  
+  <!-- Data points on the curve -->
+  <circle cx="35" cy="68" r="3" fill="#64748B"/>
+  <circle cx="48" cy="48" r="3" fill="#64748B"/>
+  <circle cx="82" cy="50" r="3" fill="#64748B"/>
+  <circle cx="95" cy="78" r="3" fill="#64748B"/>
+  
+  <!-- Crosshair lines at optimum - precision -->
+  <line x1="65" y1="20" x2="65" y2="28" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="50" y1="35" x2="58" y2="35" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#64748B"/>
+      <stop offset="40%" stop-color="#3B82F6"/>
+      <stop offset="60%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#64748B"/>
+    </linearGradient>
+    <linearGradient id="pointGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+</svg>
