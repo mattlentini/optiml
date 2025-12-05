@@ -243,6 +243,25 @@ from optiml.validation import (
     validate_method,
 )
 
+# QbD Design Space
+from optiml.qbd import (
+    SpecificationType,
+    Specification,
+    spec_minimum,
+    spec_maximum,
+    spec_target,
+    spec_range,
+    DesignSpacePoint,
+    DesignSpaceResult,
+    DesignSpace,
+    RobustnessResult as QbDRobustnessResult,
+    monte_carlo_robustness,
+    ControlStrategy,
+    recommend_control_strategy,
+    plot_design_space_2d,
+    export_design_space_report,
+)
+
 
 __version__ = "0.1.0"
 
@@ -444,4 +463,20 @@ __all__ = [
     "CapabilityResult",
     "calculate_capability",
     "validate_method",
+    # QbD Design Space
+    "SpecificationType",
+    "Specification",
+    "spec_minimum",
+    "spec_maximum",
+    "spec_target",
+    "spec_range",
+    "DesignSpacePoint",
+    "DesignSpaceResult",
+    "DesignSpace",
+    "QbDRobustnessResult",
+    "monte_carlo_robustness",
+    "ControlStrategy",
+    "recommend_control_strategy",
+    "plot_design_space_2d",
+    "export_design_space_report",
 ]
