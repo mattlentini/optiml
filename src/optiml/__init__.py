@@ -215,6 +215,34 @@ try:
 except ImportError:
     PLOTLY_AVAILABLE = False
 
+# ICH Q2 Validation metrics
+from optiml.validation import (
+    ValidationLevel,
+    AccuracyResult,
+    PrecisionResult,
+    LinearityResult,
+    LODResult,
+    LOQResult,
+    SpecificityResult,
+    RobustnessResult,
+    RangeResult,
+    ICH_Q2_Report,
+    calculate_accuracy,
+    calculate_precision,
+    calculate_linearity,
+    calculate_lod,
+    calculate_loq,
+    ZFactorResult,
+    calculate_z_factor,
+    SignalMetrics,
+    calculate_signal_metrics,
+    EC50Result,
+    calculate_ec50,
+    CapabilityResult,
+    calculate_capability,
+    validate_method,
+)
+
 
 __version__ = "0.1.0"
 
@@ -391,4 +419,29 @@ __all__ = [
     "slice_plot",
     "save_figure",
     "PLOTLY_AVAILABLE",
+    # Validation (ICH Q2)
+    "ValidationLevel",
+    "AccuracyResult",
+    "PrecisionResult",
+    "LinearityResult",
+    "LODResult",
+    "LOQResult",
+    "SpecificityResult",
+    "RobustnessResult",
+    "RangeResult",
+    "ICH_Q2_Report",
+    "calculate_accuracy",
+    "calculate_precision",
+    "calculate_linearity",
+    "calculate_lod",
+    "calculate_loq",
+    "ZFactorResult",
+    "calculate_z_factor",
+    "SignalMetrics",
+    "calculate_signal_metrics",
+    "EC50Result",
+    "calculate_ec50",
+    "CapabilityResult",
+    "calculate_capability",
+    "validate_method",
 ]
